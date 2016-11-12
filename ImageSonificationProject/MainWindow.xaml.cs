@@ -1,12 +1,15 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace ImageSonificationProject
 {
 	public enum ProcessingMode
 	{
-		Mode1,
+		Brightness,
 		Mode2,
 		Mode3,
 		Mode4
@@ -17,16 +20,21 @@ namespace ImageSonificationProject
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+
+		public const int SampleRate = 44100;
 		private readonly MediaPlayer _player;
 		private ImageProcessor _imageProcessor;
 		private ProcessingMode _mode;
+		private string _audioPath;
+		private WaveGenerator _waveGenerator;
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			Mode1.IsChecked = true;
-			_mode = ProcessingMode.Mode1;
+			//Start with brightness as selection for mode
+			BrightnessMode.IsChecked = true;
+			_mode = ProcessingMode.Brightness;
 
 			_player = new MediaPlayer();
 			EnablePlaybackControls(_player.Loaded);
@@ -52,14 +60,30 @@ namespace ImageSonificationProject
 				//Turn off controls during processing
 				EnablePlaybackControls(false);
 
+				//Display resized image to be processed
+				DisplayedImage.Source = ImageSourceFromFileName(dialog.FileName);
+
 				//Create processor and process the file
 				Stream stream = dialog.OpenFile();
 				_imageProcessor = new ImageProcessor(stream, ProgressBar);
-				_imageProcessor.Process(_mode);
+				var imageAudioData = _imageProcessor.Process(_mode);
+				_waveGenerator = new WaveGenerator(SampleRate);
+				_audioPath = _waveGenerator.SaveWavFile(imageAudioData);
 
 				//Enable controls once processing is complete
 				EnablePlaybackControls(true);
 			}
+		}
+
+		private ImageSource ImageSourceFromFileName(string fileName)
+		{
+			var image = new BitmapImage();
+			image.BeginInit();
+			image.UriSource = new Uri(fileName);
+			image.DecodePixelWidth = ImageProcessor.ImageWidth;
+			image.DecodePixelHeight = ImageProcessor.ImageHeight;
+			image.EndInit();
+			return image;
 		}
 
 		private void Play_Click(object sender, RoutedEventArgs e)
@@ -91,8 +115,8 @@ namespace ImageSonificationProject
 		/// <param name="e"></param>
 		private void ModeSelection_Click(object sender, RoutedEventArgs e)
 		{
-			if (sender.Equals(Mode1))
-				_mode = ProcessingMode.Mode1;
+			if (sender.Equals(BrightnessMode))
+				_mode = ProcessingMode.Brightness;
 			else if (sender.Equals(Mode2))
 				_mode = ProcessingMode.Mode2;
 			else if (sender.Equals(Mode3))
