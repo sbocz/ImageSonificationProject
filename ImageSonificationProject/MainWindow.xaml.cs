@@ -29,6 +29,7 @@ namespace ImageSonificationProject
 			_mode = ProcessingMode.Mode1;
 
 			_player = new MediaPlayer();
+			EnablePlaybackControls(_player.Loaded);
 		}
 
 		/// <summary>
