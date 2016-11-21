@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Controls;
 
@@ -8,22 +9,26 @@ namespace ImageSonificationProject
 	{
 		public const int ImageHeight = 300;
 		public const int ImageWidth = 400;
-		public const int MinimumFrequency = 50;
-		public const int MaximumFrequency = 20000;
 
 		//Image stretched to ImageWidth x ImageHeight
 		private readonly Bitmap _image;
 		private readonly ProgressBar _progressBar;
+		private readonly float[] _frequencies = new float[ImageHeight];
+		private const float BaseFrequency = 440;
 
 		public ImageProcessor(Stream stream, ProgressBar progressBar)
 		{
 			//Stretch it out
 			_image = new Bitmap(new Bitmap(stream), new Size(ImageWidth, ImageHeight));
 
-			//Flip for processing so that 0 means bottom of y axis
-			//Turns image upside down with pixels in the same column as before flip
-			_image.RotateFlip(RotateFlipType.Rotate180FlipX);
-
+			//Math stuff http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html
+			//We want frequency change to sound linear as we move up the image
+			var a = Math.Pow(2, (double)1 / 12);
+			for (int i = 0; i < ImageHeight; i++)
+			{
+				float n = i * ((float)1 / 3) - 35;
+				_frequencies[i] = (float)(BaseFrequency * Math.Pow(a, n)) - 50;
+			}
 			_progressBar = progressBar;
 		}
 
@@ -63,10 +68,9 @@ namespace ImageSonificationProject
 		{
 			var pixelColor = _image.GetPixel(x, y);
 			float amplitudeFactor = GetAmplitudeForColorAndMode(pixelColor, mode);
-			float heightFactor = (float)y / (float)ImageHeight;
 
-			//FOR LINEAR CHANGE IN FREQUENCY WITH HEIGHT(likely will change)
-			int frequency = (int)(heightFactor * (MaximumFrequency - MinimumFrequency) + MinimumFrequency);
+			//Use frequency table
+			int frequency = (int)_frequencies[y];
 
 			return new AudioData()
 			{
@@ -88,8 +92,8 @@ namespace ImageSonificationProject
 			{
 				case ProcessingMode.Brightness:
 					return pixelColor.GetBrightness();
-				case ProcessingMode.Mode2:
-					break;
+				case ProcessingMode.Darkness:
+					return 1 - pixelColor.GetBrightness();
 				case ProcessingMode.Mode3:
 					break;
 				case ProcessingMode.Mode4:

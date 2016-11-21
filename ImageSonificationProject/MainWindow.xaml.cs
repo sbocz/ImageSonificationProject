@@ -10,7 +10,7 @@ namespace ImageSonificationProject
 	public enum ProcessingMode
 	{
 		Brightness,
-		Mode2,
+		Darkness,
 		Mode3,
 		Mode4
 	}
@@ -20,13 +20,13 @@ namespace ImageSonificationProject
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-
+		//44kHz
 		public const int SampleRate = 44100;
 		private readonly MediaPlayer _player;
 		private ImageProcessor _imageProcessor;
 		private ProcessingMode _mode;
 		private string _audioPath;
-		private WaveGenerator _waveGenerator;
+		private WaveFileGenerator _waveGenerator;
 
 		public MainWindow()
 		{
@@ -67,8 +67,9 @@ namespace ImageSonificationProject
 				Stream stream = dialog.OpenFile();
 				_imageProcessor = new ImageProcessor(stream, ProgressBar);
 				var imageAudioData = _imageProcessor.Process(_mode);
-				_waveGenerator = new WaveGenerator(SampleRate);
+				_waveGenerator = new WaveFileGenerator(SampleRate);
 				_audioPath = _waveGenerator.SaveWavFile(imageAudioData);
+				_player.InitializePlayer(_audioPath);
 
 				//Enable controls once processing is complete
 				EnablePlaybackControls(true);
@@ -117,8 +118,8 @@ namespace ImageSonificationProject
 		{
 			if (sender.Equals(BrightnessMode))
 				_mode = ProcessingMode.Brightness;
-			else if (sender.Equals(Mode2))
-				_mode = ProcessingMode.Mode2;
+			else if (sender.Equals(DarknessMode))
+				_mode = ProcessingMode.Darkness;
 			else if (sender.Equals(Mode3))
 				_mode = ProcessingMode.Mode3;
 			else if (sender.Equals(Mode4))

@@ -19,7 +19,7 @@
 				<StackPanel x:Name="ControlsPanel" Orientation="Vertical" DockPanel.Dock="Left" Grid.Row="0">
 					<Button x:Name="UploadButton" Height="Auto" Width="Auto" Click="Upload_Click" Content="Upload"/>
 					<RadioButton x:Name="BrightnessMode" Content="Brightness" GroupName="ProcessingModes" Click="ModeSelection_Click"/>
-					<RadioButton x:Name="Mode2" Content="Mode 2" GroupName="ProcessingModes" Click="ModeSelection_Click"/>
+					<RadioButton x:Name="DarknessMode" Content="Darkness" GroupName="ProcessingModes" Click="ModeSelection_Click"/>
 					<RadioButton x:Name="Mode3" Content="Mode 3" GroupName="ProcessingModes" Click="ModeSelection_Click"/>
 					<RadioButton x:Name="Mode4" Content="Mode 4" GroupName="ProcessingModes" Click="ModeSelection_Click"/>
 				</StackPanel>

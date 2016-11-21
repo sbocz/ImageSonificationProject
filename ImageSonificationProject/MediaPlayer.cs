@@ -54,6 +54,25 @@ namespace ImageSonificationProject
 		}
 
 		/// <summary>
+		/// Initializes the sound player
+		/// </summary>
+		/// <returns>True is media is loaded. False if no media is loaded.</returns>
+		public bool InitializePlayer(string path)
+		{
+
+			_mediaFilePath = path;
+
+			if (_mediaFilePath != null)
+			{
+				_soundPlayer = new WaveOut();
+				_audioFileReader = new AudioFileReader((_mediaFilePath));
+				_soundPlayer.Init(_audioFileReader);
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
 		/// Finds the first .wav file in the codebase directory and returns its path
 		/// </summary>
 		/// <returns></returns>
