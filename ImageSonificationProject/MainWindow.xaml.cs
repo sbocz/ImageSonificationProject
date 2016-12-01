@@ -67,7 +67,7 @@ namespace ImageSonificationProject
 				Stream stream = dialog.OpenFile();
 				_imageProcessor = new ImageProcessor(stream, ProgressBar);
 				var imageAudioData = _imageProcessor.Process(_mode);
-				_waveGenerator = new WaveFileGenerator(SampleRate);
+				_waveGenerator = new WaveFileGenerator(SampleRate, dialog.FileName, _mode);
 				_audioPath = _waveGenerator.SaveWavFile(imageAudioData);
 				_player.InitializePlayer(_audioPath);
 
