@@ -83,7 +83,8 @@ namespace ImageSonificationProject
 			if (directory != null)
 			{
 				directory = directory.Substring(directory.IndexOf("c", StringComparison.Ordinal));
-				return Directory.GetFiles(directory, "*.wav").FirstOrDefault();
+				//return Directory.GetFiles(directory, "*.wav").FirstOrDefault();
+				return null;
 			}
 			return null;
 		}
